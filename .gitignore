@@ -1,0 +1,6 @@
+.vs
+.git
+out
+.vs/**
+.git/**
+out/**
