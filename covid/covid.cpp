@@ -1,12 +1,14 @@
-﻿// covid.cpp : Defines the entry point for the application.
-//
+﻿#include "covid.h"
 
-#include "covid.h"
+#include <iostream>
 
-using namespace std;
-
-int main()
+Covid::Covid()
 {
-	cout << "Hello CMake." << endl;
-	return 0;
+    std::cout << "hello world\n";
 }
+
+Covid::~Covid()
+{
+    std::cout << "Goodbye world\n";
+}
+

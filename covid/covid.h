@@ -1,8 +1,11 @@
-﻿// covid.h : Include file for standard system include files,
-// or project specific include files.
+﻿#ifndef COVID_H
+#define COVID_H
 
-#pragma once
+class Covid
+{
+public:
+    Covid();
+    ~Covid();
+};
 
-#include <iostream>
-
-// TODO: Reference additional headers your program requires here.
+#endif //COVID_H
