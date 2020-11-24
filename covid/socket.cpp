@@ -61,6 +61,9 @@ SocketImpl::SocketImpl(const SocketImpl& rhs)
     , isClientListener_(rhs.isClientListener_)
     , isInitialized_(rhs.isInitialized_)
 {
+    //random code so the debugger will jump in here
+    int f = 0;
+    f++;
 }
 
 SocketImpl::SocketImpl(SocketImpl&& rhs) noexcept
@@ -70,7 +73,8 @@ SocketImpl::SocketImpl(SocketImpl&& rhs) noexcept
     , isClientListener_(rhs.isClientListener_)
     , isInitialized_(rhs.isInitialized_)
 {
-    
+    rhs.addressInfo_ = nullptr;
+    rhs.socket_ = 0;
 }
 
 SocketImpl::~SocketImpl()
@@ -102,6 +106,10 @@ SocketImpl& SocketImpl::operator=(SocketImpl&& rhs) noexcept
     isConnectionListener_ = rhs.isConnectionListener_;
     isClientListener_ = rhs.isClientListener_;
     isInitialized_ = rhs.isInitialized_;
+
+    rhs.addressInfo_ = nullptr;
+    rhs.socket_ = 0;
+
     return *this;
 }
 
@@ -234,59 +242,64 @@ SOCKET SocketImpl::accept() const
     return clientSocket;
 }
 
-ServerSocket::ServerSocket()
-    : impl_(std::make_unique<SocketImpl>())
+Port::Port(const std::string& ipAddress, const std::string& portNumber)
+    : ipAddress_(ipAddress)
+    , portNumber_(portNumber)
+    , portListener_(std::make_unique<SocketImpl>())
 {
     
 }
 
-ServerSocket::ServerSocket(const ServerSocket& rhs)
+Port::Port(Port&& rhs) noexcept = default;
+Port::~Port() = default;
+Port& Port::operator=(Port&& rhs) noexcept = default;
+
+std::string Port::ipAddress() const noexcept
 {
-   if(!rhs.impl_)
-   {
-       throw CovidException("rhs has no impl");
-   }
-
-   if(!impl_)
-   {
-       impl_ =std::make_unique<SocketImpl>();
-   }
-
-   *impl_ = *rhs.impl_;
+    return ipAddress_;
 }
 
-ServerSocket& ServerSocket::operator=(const ServerSocket& rhs)
+std::string Port::portNumber() const noexcept
 {
-   if(!rhs.impl_)
-   {
-       throw CovidException("rhs has no impl");
-   }
-
-   if(!impl_)
-   {
-       impl_ =std::make_unique<SocketImpl>();
-   }
-
-   *impl_ = *rhs.impl_;
-
-   return *this;
+    return portNumber_;
 }
 
-ServerSocket::~ServerSocket() = default;
-
-void ServerSocket::listen(const std::string& ipAddress, const std::string& portNumber)
+SocketImpl::Ptr Port::listen() const
 {
-    if(!impl_)
-    {
-        throw InvalidSocketException("listen called on invalid socket");
-    }
-
-    client_ = impl_->waitForClient(ipAddress, portNumber);
+    return portListener_->waitForClient(ipAddress_, portNumber_);
 }
 
-std::vector<char> ServerSocket::receive()
+Socket Socket::listenOn(const Port& port)
 {
-    return client_->receive();
+    return Socket(port.listen());
 }
 
-ClientSocket::~ClientSocket() = default;
+/*Socket&& Socket::connectTo(const Port& port)
+{
+    
+}*/
+
+Socket::Socket(Socket&& rhs)
+{
+    socket_ = std::move(rhs.socket_);
+}
+
+Socket::~Socket() = default;
+
+Socket& Socket::operator=(Socket&& rhs)
+{
+    socket_ = std::move(rhs.socket_);
+    return *this;
+}
+
+Socket::Socket(std::unique_ptr<SocketImpl>&& socket)
+    : socket_(std::move(socket))
+{
+    
+}
+
+std::vector<char> Socket::receive() const
+{
+    return socket_->receive();
+}
+

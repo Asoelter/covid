@@ -6,35 +6,52 @@
 #include <vector>
 
 class SocketImpl;
+class Socket;
 
-class ServerSocket
+class Port
 {
 public:
-    ServerSocket();
-    ServerSocket(const ServerSocket& rhs);
-    //ServerSocket(ServerSocket&&) = default;
-    ~ServerSocket();
+    Port(const std::string& ipAddress, const std::string& portNumber);
+    Port(const Port& rhs) = delete;
+    Port(Port&& rhs) noexcept;
+    ~Port();
 
-    ServerSocket& operator=(const ServerSocket& rhs);
-    //ServerSocket& operator=(ServerSocket&&) = default;
+    Port& operator=(const Port& rhs) = delete;
+    Port& operator=(Port&& rhs) noexcept;
 
-    void listen(const std::string& ipAddress, const std::string& portNumber);
-    std::vector<char> receive();
+    std::string ipAddress() const noexcept;
+    std::string portNumber() const noexcept;
 
 private:
-    std::unique_ptr<SocketImpl> impl_;
-    std::unique_ptr<SocketImpl> client_;
+    friend Socket;
+    std::unique_ptr<SocketImpl> listen() const;
+
+private:
+    std::string                 ipAddress_;
+    std::string                 portNumber_;
+    std::unique_ptr<SocketImpl> portListener_;
 };
 
-class ClientSocket
+class Socket
 {
 public:
-    ClientSocket() = default;
-    ~ClientSocket();
+    static Socket listenOn(const Port& port);
+    static Socket&& connectTo(const Port& port);
+
+    Socket(const  Socket& rhs) = delete;
+    Socket(Socket&& rhs);
+    ~Socket();
+
+    Socket& operator=(const Socket& rhs) = delete;
+    Socket& operator=(Socket&& rhs);
+
+    std::vector<char> receive() const;
 
 private:
-    //std::unique_ptr<SocketImpl> impl_;
-};
+    Socket(std::unique_ptr<SocketImpl>&& socketImpl);
 
+private:
+    std::unique_ptr<SocketImpl> socket_;
+};
 
 #endif //SOCKET_H
