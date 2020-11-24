@@ -77,7 +77,10 @@ SocketImpl::~SocketImpl()
         freeaddrinfo(addressInfo_);
     }
 
-    WSACleanup();
+    if(isInitialized_)
+    {
+        WSACleanup();
+    }
 }
 
 SocketImpl& SocketImpl::operator=(SocketImpl&& rhs) noexcept 
