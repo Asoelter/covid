@@ -24,6 +24,9 @@ public:
     SocketImpl& operator=(SocketImpl&& rhs) noexcept;
 
     Ptr waitForClient(const std::string& ipAddress, const std::string& portNumber);
+    void connectTo(const std::string& ipAddress, const std::string& portNumber);
+
+    void send(const std::vector<char>& message) const;
     std::vector<char> receive() const;
 
 private:
@@ -106,6 +109,31 @@ SocketImpl::Ptr SocketImpl::waitForClient(const std::string& ipAddress, const st
     listen(ipAddress, portNumber);
     const auto rawSocket = accept();
     return std::unique_ptr<SocketImpl>(new SocketImpl(rawSocket, false, true)); //<raw new used to keep this constructor private
+}
+
+void SocketImpl::connectTo(const std::string& ipAddress, const std::string& portNumber)
+{
+    if(!isInitialized_)
+    {
+        init(ipAddress, portNumber);
+    }
+
+    const auto connectResult = ::connect(socket_, addressInfo_->ai_addr, static_cast<int>(addressInfo_->ai_addrlen));
+
+    if(connectResult == SOCKET_ERROR)
+    {
+        throw CovidException("Unable to connect to socket");
+    }
+
+    if(socket_ == INVALID_SOCKET)
+    {
+        throw InvalidSocketException("Invalid socket");
+    }
+}
+
+void SocketImpl::send(const std::vector<char>& message) const
+{
+    ::send(socket_, message.data(), message.size(), 0);
 }
 
 std::vector<char> SocketImpl::receive() const
@@ -252,10 +280,12 @@ Socket Socket::listenOn(const Port& port)
     return Socket(port.listen());
 }
 
-/*Socket&& Socket::connectTo(const Port& port)
+Socket Socket::connectTo(const Port& port)
 {
-    
-}*/
+    auto impl = std::make_unique<SocketImpl>();
+    impl->connectTo(port.ipAddress(), port.portNumber());
+    return Socket(std::move(impl));
+}
 
 Socket::Socket(Socket&& rhs)
 {

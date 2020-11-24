@@ -36,7 +36,7 @@ class Socket
 {
 public:
     static Socket listenOn(const Port& port);
-    static Socket&& connectTo(const Port& port);
+    static Socket connectTo(const Port& port);
 
     Socket(const  Socket& rhs) = delete;
     Socket(Socket&& rhs);
