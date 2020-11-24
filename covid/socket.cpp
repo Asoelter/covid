@@ -16,11 +16,11 @@ public:
     using Ptr = std::unique_ptr<SocketImpl>;
 
     SocketImpl();
-    SocketImpl(const SocketImpl& rhs);
+    SocketImpl(const SocketImpl& rhs) = delete;
     SocketImpl(SocketImpl&& rhs) noexcept;
     ~SocketImpl();
 
-    SocketImpl& operator=(const SocketImpl& rhs) noexcept;
+    SocketImpl& operator=(const SocketImpl& rhs) noexcept = delete;
     SocketImpl& operator=(SocketImpl&& rhs) noexcept;
 
     Ptr waitForClient(const std::string& ipAddress, const std::string& portNumber);
@@ -54,18 +54,6 @@ SocketImpl::SocketImpl()
 {
 }
 
-SocketImpl::SocketImpl(const SocketImpl& rhs)
-    : socket_(rhs.socket_)
-    , addressInfo_(nullptr)
-    , isConnectionListener_(rhs.isConnectionListener_)
-    , isClientListener_(rhs.isClientListener_)
-    , isInitialized_(rhs.isInitialized_)
-{
-    //random code so the debugger will jump in here
-    int f = 0;
-    f++;
-}
-
 SocketImpl::SocketImpl(SocketImpl&& rhs) noexcept
     : socket_(rhs.socket_)
     , addressInfo_(rhs.addressInfo_)
@@ -87,16 +75,6 @@ SocketImpl::~SocketImpl()
     }
 
     WSACleanup();
-}
-
-SocketImpl& SocketImpl::operator=(const SocketImpl& rhs) noexcept
-{
-    socket_ = rhs.socket_;
-    addressInfo_ = nullptr;
-    isConnectionListener_ = rhs.isConnectionListener_;
-    isClientListener_ = rhs.isClientListener_;
-    isInitialized_ = rhs.isInitialized_;
-    return *this;
 }
 
 SocketImpl& SocketImpl::operator=(SocketImpl&& rhs) noexcept 
