@@ -45,6 +45,7 @@ public:
     Socket& operator=(const Socket& rhs) = delete;
     Socket& operator=(Socket&& rhs);
 
+    void send(const std::vector<char>& message) const;
     std::vector<char> receive() const;
 
 private:

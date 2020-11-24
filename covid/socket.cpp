@@ -306,6 +306,11 @@ Socket::Socket(std::unique_ptr<SocketImpl>&& socket)
     
 }
 
+void Socket::send(const std::vector<char>& message) const
+{
+    socket_->send(message);
+}
+
 std::vector<char> Socket::receive() const
 {
     return socket_->receive();
