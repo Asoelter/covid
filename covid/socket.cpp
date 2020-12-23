@@ -136,7 +136,7 @@ void SocketImpl::connectTo(const std::string& ipAddress, const std::string& port
 
 void SocketImpl::send(const std::vector<char>& message) const
 {
-    ::send(socket_, message.data(), message.size(), 0);
+    ::send(socket_, message.data(), static_cast<int>(message.size()), 0);
 }
 
 std::vector<char> SocketImpl::receive() const
