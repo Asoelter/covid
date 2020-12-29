@@ -147,7 +147,9 @@ std::vector<char> SocketImpl::receive() const
 
     if(bytesReceived == - 1)
     {
-        throw CovidException("Unable to read from socket");
+        char errorBuffer[30];
+        sprintf_s(errorBuffer, "%i", WSAGetLastError());
+        throw CovidException("Unable to read from socket" + std::string(errorBuffer));
     }
 
     return std::vector<char>(std::begin(buffer), std::end(buffer));
