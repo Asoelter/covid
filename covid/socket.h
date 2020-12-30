@@ -5,6 +5,12 @@
 #include <string>
 #include <vector>
 
+template<typename T>
+concept Message = requires(T m)
+{
+    {m.serialize()} -> std::convertible_to<std::vector<char>>;
+};
+
 class SocketImpl;
 class Socket;
 
@@ -46,6 +52,13 @@ public:
     Socket& operator=(Socket&& rhs);
 
     void send(const std::vector<char>& message) const;
+
+    template<Message M>
+    void sendMessage(const M& message) const
+    {
+        send(message.serialize());
+    }
+
     std::vector<char> receive() const;
 
 private:
@@ -54,5 +67,11 @@ private:
 private:
     std::unique_ptr<SocketImpl> socket_;
 };
+
+uint16_t toNetworkByteOrder(uint16_t value);
+uint32_t toNetworkByteOrder(uint32_t value);
+
+uint16_t fromNetworkByteOrder(uint16_t value);
+uint32_t fromNetworkByteOrder(uint32_t value);
 
 #endif //SOCKET_H

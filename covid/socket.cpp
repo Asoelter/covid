@@ -321,3 +321,26 @@ std::vector<char> Socket::receive() const
     return socket_->receive();
 }
 
+uint16_t toNetworkByteOrder(uint16_t value)
+{
+    static_assert(sizeof(uint16_t) == sizeof(u_short));
+    return htons(value);
+}
+
+uint32_t toNetworkByteOrder(uint32_t value)
+{
+    static_assert(sizeof(uint32_t) == sizeof(u_long));
+    return htonl(value);
+}
+
+uint16_t fromNetworkByteOrder(uint16_t value)
+{
+    static_assert(sizeof(uint16_t) == sizeof(u_short));
+    return ntohs(value);
+}
+
+uint32_t fromNetworkByteOrder(uint32_t value)
+{
+    static_assert(sizeof(uint32_t) == sizeof(u_long));
+    return ntohl(value);
+}
