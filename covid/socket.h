@@ -47,6 +47,7 @@ public:
 
     void send(const std::vector<char>& message) const;
     std::vector<char> receive() const;
+    bool hasMessageWaiting() const;
 
 private:
     Socket(std::unique_ptr<SocketImpl>&& socketImpl);

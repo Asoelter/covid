@@ -28,6 +28,7 @@ public:
 
     void send(const std::vector<char>& message) const;
     std::vector<char> receive() const;
+    bool hasMessageWaiting() const;
 
 private:
     SocketImpl(SOCKET s, bool isConnectionListen, bool isClientListener);
@@ -153,6 +154,12 @@ std::vector<char> SocketImpl::receive() const
     }
 
     return std::vector<char>(std::begin(buffer), std::end(buffer));
+}
+
+bool SocketImpl::hasMessageWaiting() const
+{
+    char buffer[5];
+    return recv(socket_, buffer, 5 * sizeof(char), MSG_PEEK) == 0;
 }
 
 void SocketImpl::init(const std::string& ipAddress, const std::string& portNumber)
@@ -319,6 +326,11 @@ void Socket::send(const std::vector<char>& message) const
 std::vector<char> Socket::receive() const
 {
     return socket_->receive();
+}
+
+bool Socket::hasMessageWaiting() const
+{
+    return socket_->hasMessageWaiting();
 }
 
 uint16_t toNetworkByteOrder(uint16_t value)
