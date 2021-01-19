@@ -142,9 +142,9 @@ void SocketImpl::send(const std::vector<char>& message) const
 
 std::vector<char> SocketImpl::receive() const
 {
-    char buffer[5];
+    char buffer[256];
 
-    const auto bytesReceived = recv(socket_, buffer, 5 * sizeof(char), 0);
+    const auto bytesReceived = recv(socket_, buffer, 256 * sizeof(char), 0);
 
     if(bytesReceived == - 1)
     {
@@ -158,8 +158,10 @@ std::vector<char> SocketImpl::receive() const
 
 bool SocketImpl::hasMessageWaiting() const
 {
-    char buffer[5];
-    return recv(socket_, buffer, 5 * sizeof(char), MSG_PEEK) == 0;
+    unsigned long bytesWaiting = 0;
+    ioctlsocket(socket_, FIONREAD, &bytesWaiting);
+
+    return bytesWaiting != 0;
 }
 
 void SocketImpl::init(const std::string& ipAddress, const std::string& portNumber)
