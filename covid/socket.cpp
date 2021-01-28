@@ -153,7 +153,7 @@ std::vector<char> SocketImpl::receive() const
         throw CovidException("Unable to read from socket" + std::string(errorBuffer));
     }
 
-    return std::vector<char>(std::begin(buffer), std::end(buffer));
+    return std::vector<char>(std::begin(buffer), std::begin(buffer) + bytesReceived);
 }
 
 bool SocketImpl::hasMessageWaiting() const
